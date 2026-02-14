@@ -1,0 +1,10 @@
+FROM alpine:latest
+
+# Instala ferramentas para manipulação de terminal e fontes
+RUN apk add --no-cache bash ncurses
+
+COPY boot_sequence.sh /usr/local/bin/boot_sequence.sh
+RUN chmod +x /usr/local/bin/boot_sequence.sh
+
+# O segredo do "Fancy": Não ter cursor piscando e fundo limpo
+ENTRYPOINT ["/usr/local/bin/boot_sequence.sh"]
