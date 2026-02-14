@@ -1,0 +1,6 @@
+qemu-system-x86_64 \
+  -m 512M \
+  -kernel /boot/vmlinuz-linux \
+  -initrd initramfs.cpio.gz \
+  -append "console=tty1 quiet loglevel=3 rdinit=/init vga=791" \
+  -vga std

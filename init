@@ -1,0 +1,17 @@
+#!/bin/busybox sh
+
+# Instala os comandos do busybox no sistema
+/bin/busybox --install -s /bin
+
+# Montagens básicas
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+mount -t devtmpfs devtmpfs /dev
+
+clear
+echo "========================================"
+echo "    FANCY OS - BOOT DE EMERGENCIA      "
+echo "========================================"
+
+# Se o Kernel chegar aqui, você venceu
+exec /bin/busybox sh
