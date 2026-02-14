@@ -1,11 +1,21 @@
 FROM alpine:latest
 
-# Instala bash e ncurses (necessário para o comando 'tput')
-RUN apk add --no-cache bash ncurses
+# Instalação minimalista: Bash, Openbox (Janelas), Xterm (Terminal GUI) e fontes
+RUN apk add --no-cache \
+    bash \
+    ncurses \
+    openbox \
+    xterm \
+    ttf-dejavu \
+    font-cursor-misc
 
 WORKDIR /app
-COPY . .
-RUN chmod +x boot.sh spinner.sh
 
-# Define o script de boot como o processo principal
+# Copia os scripts que vamos criar abaixo
+COPY boot.sh .
+RUN chmod +x boot.sh
+
+# Define a variável de exibição (padrão para Docker no Linux)
+ENV DISPLAY=:0
+
 ENTRYPOINT ["./boot.sh"]

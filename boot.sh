@@ -1,59 +1,49 @@
 #!/bin/bash
-# Esconde o cursor e limpa a tela
-tput civis
+tput civis # Esconde o cursor
 clear
 
-# Cores e Estilos
+# Cores
 CYAN='\033[0;36m'
-WHITE='\033[1;37m'
 GREEN='\033[0;32m'
 GRAY='\033[0;90m'
 NC='\033[0m'
 
-# 1. Cabeçalho de Identidade
+# --- FASE 1: BOOT VISUAL ---
 echo -e "${CYAN}"
 cat << "EOF"
-    __    _____   __  _____  __
-   / /   /  _/ | / / / / \ \/ /
-  / /    / / /  |/ / / /   \  / 
- / /___ / / / /|  / / /___ / /  
-/_____/___//_/ |_/ /_____//_/   
-      S Y S T E M   L O A D E D
+    ____  ______  ____  ______   ____  _____
+   / __ )/ __ \/ __ \/_  __/  / __ \/ ___/
+  / __  / / / / / / / / /    / / / /\__ \ 
+ / /_/ / /_/ / /_/ / / /    / /_/ /___/ / 
+/_____/\____/\____/ /_/     \____//____/  
+                                          
 EOF
-echo -e "${NC}"
+echo -e "${NC}Iniciando Kernel e Módulos de Vídeo..."
+sleep 1
 
-# 2. Coleta de Informações Reais
-# Lendo do /proc e /etc (padrão Linux)
-KERNEL_VER=$(uname -r | cut -d '-' -f1)
-OS_NAME=$(grep PRETTY_NAME /etc/os-release | cut -d '"' -f2)
-CPU_CORES=$(nproc)
-TOTAL_RAM=$(free -m | awk '/Mem:/ { print $2 }')
+# Telemetria Real
+KERNEL=$(uname -r)
+RAM_TOTAL=$(free -m | awk '/Mem:/ {print $2}')
+echo -e "${GRAY}[ INFO ] Kernel: $KERNEL${NC}"
+echo -e "${GRAY}[ INFO ] Memória: ${RAM_TOTAL}MB${NC}"
+sleep 1
 
-# 3. Sequência de Inicialização "Fancy"
-echo -e "${GRAY}--- INITIALIZING SERVICES ---${NC}"
-sleep 0.5
-echo -e "${GREEN} [OK] ${NC} Kernel: ${WHITE}${KERNEL_VER}${NC}"
-sleep 0.3
-echo -e "${GREEN} [OK] ${NC} Distro: ${WHITE}${OS_NAME}${NC}"
-sleep 0.3
-echo -e "${GREEN} [OK] ${NC} Cores:  ${WHITE}${CPU_CORES} detected${NC}"
-sleep 0.3
-echo -e "${GREEN} [OK] ${NC} Memory: ${WHITE}${TOTAL_RAM}MB available${NC}"
-echo -e "${GRAY}-----------------------------${NC}\n"
-
-# 4. Monitor de Recursos em Tempo Real (Loop rápido)
-echo -e "Estabilizando ambiente desktop..."
-for i in {1..5}; do
-    # Cálculo real de uso de memória no momento
-    USED_RAM=$(free -m | awk '/Mem:/ { print $3 }')
-    PERCENT=$(( USED_RAM * 100 / TOTAL_RAM ))
-    
-    echo -ne "\rStatus: [${GREEN}RAM: ${USED_RAM}MB / ${PERCENT}%${NC}] [${CYAN}CPU: Ativa${NC}] "
-    sleep 0.4
+# Barra de Progresso "Fancy"
+echo -n "Carregando Desktop: "
+for i in {1..25}; do
+    echo -ne "\e[42m \e[0m" # Bloco verde
+    sleep 0.05
 done
+echo -e " ${GREEN}DONE${NC}"
+sleep 0.5
 
-# 5. Finalização e Entrega
-tput cnorm
-echo -e "\n\n${WHITE}SISTEMA PRONTO.${NC} O console está disponível abaixo."
-echo -e "${GRAY}Digite 'exit' para desligar.${NC}\n"
-/bin/bash
+# --- FASE 2: TRANSIÇÃO PARA GUI ---
+echo -e "\n${CYAN}Subindo interface gráfica X11...${NC}"
+
+# Inicia o Gerenciador de Janelas em Background (silencioso)
+openbox --replace > /dev/null 2>&1 &
+sleep 1
+
+# Finaliza o boot e abre a janela principal
+tput cnorm # Restaura o cursor
+exec xterm -geometry 100x30+50+50 -bg black -fg white -fa 'Monospace' -fs 11 -e /bin/bash
